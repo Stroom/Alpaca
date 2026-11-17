@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: alpaca-trader
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${POSTGRES_DB:alpaca}
+    username: ${POSTGRES_USER:alpaca}
+    password: ${POSTGRES_PASSWORD:alpaca}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  mvc:
+    problemdetails:
+      enabled: true
+    async:
+      # The trade-events SSE proxy is long-lived
+      request-timeout: -1
+
+alpaca:
+  client-id: ${ALPACA_CLIENT_ID:}
+  client-secret: ${ALPACA_CLIENT_SECRET:}
+  # Sandbox by default. Production: https://authx.alpaca.markets/v1/oauth2/token,
+  # https://broker-api.alpaca.markets, https://data.alpaca.markets
+  token-url: ${ALPACA_TOKEN_URL:https://authx.sandbox.alpaca.markets/v1/oauth2/token}
+  broker-base-url: ${ALPACA_BROKER_URL:https://broker-api.sandbox.alpaca.markets}
+  market-data-base-url: ${ALPACA_MARKET_DATA_URL:https://data.sandbox.alpaca.markets}
+  # 4-character correspondent code; needed to fund accounts with simulated incoming wires (sandbox)
+  correspondent: ${ALPACA_CORRESPONDENT:}
+  # iex is free; sip needs a market data subscription
+  market-data-feed: ${ALPACA_MARKET_DATA_FEED:iex}
+  events:
+    # Background subscribers for /v2/events/trades, /v2beta1/events/activities and /v2/events/funding/status
+    enabled: ${ALPACA_EVENTS_ENABLED:true}
+    # On first start (no stored cursor) replay this many days of history
+    initial-lookback-days: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

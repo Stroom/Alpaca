@@ -1,0 +1,7 @@
+# Liquibase master changelog. Add changesets as files under changes/ (e.g. 001-orders.yaml);
+# they are applied in alphabetical order.
+databaseChangeLog:
+  - includeAll:
+      path: changes/
+      relativeToChangelogFile: true
+      errorIfMissingOrEmpty: false

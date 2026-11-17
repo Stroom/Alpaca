@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alpaca Trader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">Alpaca Trader <span class="env">sandbox</span></div>
+    <label class="switcher">
+        <span>Account</span>
+        <select id="account-select"><option value="">— no accounts —</option></select>
+    </label>
+    <div class="balances" id="balances"></div>
+    <div class="streams" id="streams" title="Alpaca event streams"></div>
+</header>
+
+<main class="layout">
+    <!-- Accounts -->
+    <section class="card" id="accounts-card">
+        <h2>Accounts</h2>
+        <details>
+            <summary>Create account</summary>
+            <form id="create-account-form" class="form-grid">
+                <label>Given name<input name="givenName" required></label>
+                <label>Family name<input name="familyName" required></label>
+                <label class="span-2">Email<input name="email" type="email" required></label>
+                <label>Date of birth<input name="dateOfBirth" type="date" value="1990-01-01"></label>
+                <label>Phone<input name="phone" placeholder="optional"></label>
+                <label class="span-2">Street<input name="street" value="20 N San Mateo Dr"></label>
+                <label>City<input name="city" value="San Mateo"></label>
+                <label>State<input name="state" value="CA" maxlength="2"></label>
+                <label>Postal code<input name="postalCode" value="94401"></label>
+                <label>Tax ID (required by Alpaca)<input name="taxId" required></label>
+                <button class="primary span-2" type="submit">Create at Alpaca</button>
+            </form>
+        </details>
+        <details>
+            <summary>Import existing account</summary>
+            <form id="import-account-form" class="inline-form">
+                <input name="accountId" placeholder="Alpaca account id (UUID)" required>
+                <button type="submit">Import</button>
+            </form>
+        </details>
+
+        <div id="account-detail" class="account-detail muted">Select or create an account.</div>
+
+        <h3>Funding</h3>
+        <form id="fund-form" class="inline-form">
+            <input name="amount" type="number" min="1" step="0.01" value="10000" required>
+            <button type="submit">Deposit (simulated wire)</button>
+        </form>
+        <table class="compact" id="funding-table">
+            <thead><tr><th>Created</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Instruments & order ticket -->
+    <section class="card" id="trade-card">
+        <h2>Instruments</h2>
+        <div class="search-row">
+            <input id="instrument-search" type="search" placeholder="Search symbol or name, e.g. AAPL or apple" autocomplete="off">
+            <button id="sync-instruments" title="Reload the asset list from Alpaca">Sync</button>
+        </div>
+        <div class="muted small" id="instrument-count"></div>
+        <ul class="results" id="instrument-results"></ul>
+
+        <div id="ticket" class="ticket hidden">
+            <div class="ticket-head">
+                <div>
+                    <div class="symbol" id="ticket-symbol"></div>
+                    <div class="muted small" id="ticket-name"></div>
+                </div>
+                <button id="refresh-quote">Refresh quote</button>
+            </div>
+            <div class="quote" id="quote"></div>
+
+            <form id="order-form" class="form-grid">
+                <div class="side-toggle span-2">
+                    <label><input type="radio" name="side" value="buy" checked><span>Buy</span></label>
+                    <label><input type="radio" name="side" value="sell"><span>Sell</span></label>
+                </div>
+                <label>Type
+                    <select name="type">
+                        <option value="market">Market</option>
+                        <option value="limit">Limit</option>
+                        <option value="stop">Stop</option>
+                        <option value="stop_limit">Stop limit</option>
+                    </select>
+                </label>
+                <label>Time in force
+                    <select name="timeInForce">
+                        <option value="day">Day</option>
+                        <option value="gtc">GTC</option>
+                        <option value="ioc">IOC</option>
+                        <option value="fok">FOK</option>
+                    </select>
+                </label>
+                <label>Amount by
+                    <select name="sizeMode">
+                        <option value="qty">Quantity</option>
+                        <option value="notional">Notional ($)</option>
+                    </select>
+                </label>
+                <label>Size<input name="size" type="number" min="0" step="any" value="1" required></label>
+                <label class="price-field limit-field hidden">Limit price<input name="limitPrice" type="number" step="any"></label>
+                <label class="price-field stop-field hidden">Stop price<input name="stopPrice" type="number" step="any"></label>
+                <div class="estimate span-2 muted small" id="estimate"></div>
+                <button class="primary span-2" type="submit" id="submit-order">Send order</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Orders & executions -->
+    <section class="card wide" id="orders-card">
+        <div class="card-head">
+            <h2>Orders</h2>
+            <span class="muted small" id="orders-updated"></span>
+        </div>
+        <table class="orders" id="orders-table">
+            <thead>
+            <tr>
+                <th></th><th>Created</th><th>Symbol</th><th>Side</th><th>Type</th><th class="num">Qty / $</th>
+                <th class="num">Limit</th><th>Status</th><th class="num">Filled</th><th class="num">Avg price</th>
+                <th class="num">Quote at entry</th><th></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="muted empty" id="orders-empty">No orders for this account yet.</div>
+    </section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
